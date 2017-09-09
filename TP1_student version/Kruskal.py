@@ -39,5 +39,29 @@ class Kruskal(object):
         self.uf = UnionFind(g.N)
         self.g = g
 
-    def getMSTCost(self, sol, source):
-        raise NotImplementedError()
+    def getMSTCost(self, sol):
+        #resetting values from UnionFind class so we don't have any remnants and only use the one
+        #provided in our given solution
+    
+        self.uf.reset()
+        Edges = sol.edges
+        MST = []
+        total = 0
+    
+        #adding edges currently in our sol to our unionfind class
+        e = self.g.get_sorted_edges()
+
+        for i in range(0, len(Edges)):
+            self.uf.add(Edges[i])
+
+        #calculating the total MST according to Kruskal's Algorithm
+        for i in range(0, len(e)):
+            if (not(self.uf.makes_cycle(e[i]))):
+                self.uf.add(e[i])
+                MST.append(e[i])
+    
+        for i in range(0, len(MST)):
+            total = total + MST[i].cost
+    
+        return(total)
+        

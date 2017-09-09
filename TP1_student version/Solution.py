@@ -14,20 +14,14 @@ class Solution(object):
             self.not_visited = np.arange(0,s.N)
             self.edgecosts = s.costs
             self.edgecosts[self.edgecosts == 0] = inf
-            self.sortedcosts = list(map(lambda x:x.cost, s.get_sorted_edges()))
-            self.sortedsources = list(map(lambda x:x.source, s.get_sorted_edges()))
-            self.sorteddestinations = list(map(lambda x:x.destination, s.get_sorted_edges()))
-            
-            
+            self.edges = []
         elif isinstance(s, Solution):
             self.g = s.g
             self.cost = s.cost
             self.visited = s.visited
             self.not_visited = s.not_visited
             self.edgecosts = s.costs
-            self.sortedcosts = s.sortedcosts
-            self.sortedsources = s.sortedsources
-            self.sorteddestination = s.sorteddestination
+            self.edges = s.edges
         else:
             raise ValueError('you should give a graph or a solution')
 
@@ -35,6 +29,7 @@ class Solution(object):
         self.cost = self.cost + self.g.get_edge(v,u).cost
         self.visited.append(u)
         self.not_visited = np.delete(self.not_visited, np.argwhere(self.not_visited == u))
+        self.edges.append(Edge(v,u, self.g.get_edge(v,u).cost))
 
     def print(self):
         print("These are the visited cities in order", self.visited)
