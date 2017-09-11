@@ -4,6 +4,7 @@ from Graph import Graph
 from Graph import Edge
 import numpy as np
 from numpy import inf
+import copy
 
 class Solution(object):
     def __init__(self, s):
@@ -12,7 +13,7 @@ class Solution(object):
             self.cost = 0
             self.visited = []
             self.not_visited = np.arange(0,s.N)
-            self.edgecosts = s.costs
+            self.edgecosts = copy.deepcopy(s.costs)
             self.edgecosts[self.edgecosts == 0] = inf
             self.edges = []
         elif isinstance(s, Solution):
@@ -36,9 +37,6 @@ class Solution(object):
         print("These are the ones left to visit in order", self.not_visited)
         print("Here is the cost for the trip",self.cost)
 
-#First = Graph('N10.data')
-
-#Sol = Solution(First)
 '''
 #Sol.add_edge(0,7)
 print(Sol.cost)

@@ -15,7 +15,35 @@ class Node(object):
         self.v = v
         self.solution = sol
         self.Kru = Kruskal(sol.g)
-        self.heuristic_cost = self.Kru.getMSTCost(self.solution)
+        
+        cityvector = copy.deepcopy(self.solution.visited)
+        cityvector.append(0)
+
+        
+        try:
+            villeproche = np.amin(np.delete(self.solution.edgecosts[self.v,:], cityvector))
+        except ValueError:
+            villeproche = 0
+        else:
+            villeproche = np.amin(np.delete(self.solution.edgecosts[self.v,:], cityvector))
+
+        try:
+            orgtoville = np.amin(np.delete(self.solution.g.costs[0,:], cityvector))
+        except ValueError:
+            orgtoville = 0
+        else:
+            orgtoville = np.amin(np.delete(self.solution.g.costs[0,:], cityvector))
+            
+        self.heuristic_cost = self.Kru.getMSTCost(self.solution) + villeproche + orgtoville
+
+
+        #self.heuristic_cost = self.Kru.getMSTCost(self.solution)
+
+        #villeproche = np.amin(np.delete(self.solution.edgecosts[self.v,:], self.solution.visited))
+        #print(self.solution.g.costs)
+        #orgtoville = np.amin(np.delete(self.solution.g.costs[0, :], self.solution.visited))
+        #print(orgtoville)
+        
     def explore_node(self):
         #Returns all possible nodes connected to this one in a form of a list
         NextCities = self.solution.edgecosts[self.v, :]
@@ -27,10 +55,32 @@ class Node(object):
             NextNodes[i].update_heuristic_cost()
         return NextNodes
     def update_heuristic_cost(self):
-        self.heuristic_cost = self.Kru.getMSTCost(self.solution)
+        #updates the cost of the heuristic for the Node, used in the explore_node method to update the heuristic cost before returning the new nodes
+        cityvector = copy.deepcopy(self.solution.visited)
+        cityvector.append(0)
+        try:
+            villeproche = np.amin(np.delete(self.solution.edgecosts[self.v,:], cityvector))
+        except ValueError:
+            villeproche = 0
+        else:
+            villeproche = np.amin(np.delete(self.solution.edgecosts[self.v,:], cityvector))
+
+        try:
+            orgtoville = np.amin(np.delete(self.solution.g.costs[0,:], cityvector))
+        except ValueError:
+            orgtoville = 0
+        else:
+            orgtoville = np.amin(np.delete(self.solution.g.costs[0,:], cityvector))
+            
+        self.heuristic_cost = self.Kru.getMSTCost(self.solution) + villeproche + orgtoville
+        #print('ville la plus proche', villeproche)
+        #print('closest to origin', orgtoville)
+        #self.solution.print()
+
+        
         
 def main():
-    g = Graph("N10.data")
+    g = Graph("N17.data")
     sol = Solution(g)
     Nstart = Node(0, sol)
     N1 = Nstart.explore_node()
@@ -38,55 +88,6 @@ def main():
     Nodes = []
     Nodes.append(Nstart)
     solutionfound = 0
-    '''
-    sol1 = Solution(g)
-    sol2 = Solution(g)
-    sol3 = Solution(g)
-    sol4 = Solution(g)
-    sol5 = Solution(g)
-    sol6 = Solution(g)
-    sol7 = Solution(g)
-    sol8 = Solution(g)
-    sol9 = Solution(g)
-
-    sol1.add_edge(0,1)
-    sol2.add_edge(0,2)
-    sol3.add_edge(0,3)
-    sol4.add_edge(0,4)
-    sol5.add_edge(0,5)
-    sol6.add_edge(0,6)
-    sol7.add_edge(0,7)
-    sol8.add_edge(0,8)
-    sol9.add_edge(0,9)
-
-    Kru1 = Kruskal(g)
-    Kru2 = Kruskal(g)
-    Kru3 = Kruskal(g)
-    Kru4 = Kruskal(g)
-    Kru5 = Kruskal(g)
-    Kru6 = Kruskal(g)
-    Kru7 = Kruskal(g)
-    Kru8 = Kruskal(g)
-    Kru9 = Kruskal(g)
-
-
-    print(Kru1.getMSTCost(sol1))
-    print(Kru2.getMSTCost(sol2))
-    print(Kru3.getMSTCost(sol3))
-    print(Kru4.getMSTCost(sol4))
-    print(Kru5.getMSTCost(sol5))
-    print(Kru6.getMSTCost(sol6))
-    print(Kru7.getMSTCost(sol7))
-    print(Kru8.getMSTCost(sol8))
-    print(Kru9.getMSTCost(sol9))
-
-    for i in range(0, len(N1)):
-        N1[i].solution.print()
-        print(N1[i].heuristic_cost)
-'''
-
- 
-
     t1 = time()
     while(solutionfound == 0):
         Nnext = Nodes[len(Nodes)-1]
@@ -95,22 +96,25 @@ def main():
     
         for i in range(0, len(NewNodes)):
             newcost.append((NewNodes[i].solution.cost + NewNodes[i].heuristic_cost))
-        a = np.amax(newcost)
-        index = np.argwhere(newcost == a)
 
+
+        index = np.argwhere(newcost == np.amax(newcost))
+        a = NewNodes[int(index[0])]
+        
         for j in range(0, len(NewNodes)):
             if ((j in Nnext.solution.not_visited) and ( j!= 0)):
-                if (a > (NewNodes[j].solution.cost + NewNodes[j].heuristic_cost)):
-                    a = NewNodes[j].solution.cost + NewNodes[j].heuristic_cost
+                if (isN2betterThanN1(a, NewNodes[j])):
+                    a = NewNodes[j]
                     index = j
 
             if ((len(Nnext.solution.not_visited) == 1) and ( j == 0 )):
-                a = NewNodes[0].solution.cost + NewNodes[0].heuristic_cost
+                a = NewNodes[0]
                 index = 0
 
-
+        
         N = NewNodes[int(index)]
         Nodes.append(copy.deepcopy(N))
+        #print(Nodes[len(Nodes)-1].solution.not_visited)
         if (len(Nodes[len(Nodes)-1].solution.not_visited) == 0):
             solutionfound = 1
             print('solution found!')
@@ -118,8 +122,12 @@ def main():
             print(Nodes[len(Nodes)-1].solution.print())
             t2 = time()
             td = t2-t1
-            print('time difference', td) 
-    
+            print('time difference', td)
+    print(Nodes[0].solution.g.costs)
+
+
+
+
 
 def isN2betterThanN1(N1, N2):
     if ((N1.solution.cost + N1.heuristic_cost) > (N2.solution.cost + N2.heuristic_cost)):
@@ -130,6 +138,3 @@ def isN2betterThanN1(N1, N2):
 
 if __name__ == '__main__':
     main()
-'''import Kruskal
-    Kruskal.kruskal = Kruskal.Kruskal(g)
-    heap = Q.PriorityQueue()'''
