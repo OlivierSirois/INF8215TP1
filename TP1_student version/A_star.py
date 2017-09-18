@@ -49,6 +49,7 @@ class Node(object):
         NextCities = self.solution.edgecosts[self.v, :]
         NextNodes = []
         for i in range(0, len(NextCities)):
+            # do we need to check i != self.v
             NextNodes.append(copy.deepcopy(Node(self.v, self.solution)))
             NextNodes[i].solution.add_edge(NextNodes[i].v,i)
             NextNodes[i].v = i
@@ -80,27 +81,24 @@ class Node(object):
         
         
 def main():
-    g = Graph("N17.data")
+    g = Graph("N10.data")
     sol = Solution(g)
     Nstart = Node(0, sol)
-    N1 = Nstart.explore_node()
-    Nusing = copy.deepcopy(Nstart)
     Nodes = []
     Nodes.append(Nstart)
     solutionfound = 0
     t1 = time()
     while(solutionfound == 0):
-        Nnext = Nodes[len(Nodes)-1]
+        Nnext = Nodes[len(Nodes)-1] # get the node be explored (which is the last one)
         NewNodes = Nnext.explore_node()
         newcost = []
     
         for i in range(0, len(NewNodes)):
             newcost.append((NewNodes[i].solution.cost + NewNodes[i].heuristic_cost))
 
-
+        # Look for smallest cost not visited node
         index = np.argwhere(newcost == np.amax(newcost))
-        a = NewNodes[int(index[0])]
-        
+        a = NewNodes[int(index[0])]        
         for j in range(0, len(NewNodes)):
             if ((j in Nnext.solution.not_visited) and ( j!= 0)):
                 if (isN2betterThanN1(a, NewNodes[j])):
@@ -111,9 +109,11 @@ def main():
                 a = NewNodes[0]
                 index = 0
 
-        
-        N = NewNodes[int(index)]
+        N = NewNodes[int(index)] # why not just use a 
         Nodes.append(copy.deepcopy(N))
+        
+        # Nodes should be using a high priority queue not just an array ...        
+        
         #print(Nodes[len(Nodes)-1].solution.not_visited)
         if (len(Nodes[len(Nodes)-1].solution.not_visited) == 0):
             solutionfound = 1

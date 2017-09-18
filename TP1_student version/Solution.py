@@ -21,12 +21,13 @@ class Solution(object):
             self.cost = s.cost
             self.visited = s.visited
             self.not_visited = s.not_visited
-            self.edgecosts = s.costs
+            self.edgecosts = s.edgecosts
             self.edges = s.edges
         else:
             raise ValueError('you should give a graph or a solution')
 
     def add_edge(self, v, u):
+        #do we need to check if v  is in the end of visited 
         self.cost = self.cost + self.g.get_edge(v,u).cost
         self.visited.append(u)
         self.not_visited = np.delete(self.not_visited, np.argwhere(self.not_visited == u))
