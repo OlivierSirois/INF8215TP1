@@ -7,6 +7,7 @@ import numpy as np
 from numpy import inf
 import copy
 from time import time
+import queue as Q
 
 SOURCE = 0
 
@@ -44,16 +45,26 @@ class Node(object):
         #orgtoville = np.amin(np.delete(self.solution.g.costs[0, :], self.solution.visited))
         #print(orgtoville)
         
+    def __lt__(self, other):  
+        return isN2betterThanN1(other, self)
+        
     def explore_node(self):
         #Returns all possible nodes connected to this one in a form of a list
-        NextCities = self.solution.edgecosts[self.v, :]
         NextNodes = []
-        for i in range(0, len(NextCities)):
-            # do we need to check i != self.v
-            NextNodes.append(copy.deepcopy(Node(self.v, self.solution)))
-            NextNodes[i].solution.add_edge(NextNodes[i].v,i)
-            NextNodes[i].v = i
-            NextNodes[i].update_heuristic_cost()
+        if(len(self.solution.not_visited) == 1):
+            nn = copy.deepcopy(Node(self.v, self.solution))
+            nn.solution.add_edge(nn.v,0)
+            nn.v = 0
+            nn.update_heuristic_cost()
+            NextNodes.append(nn)
+        else:
+            for i in self.solution.not_visited:
+                if i != 0:
+                    nn = copy.deepcopy(Node(self.v, self.solution))
+                    nn.solution.add_edge(nn.v,i)
+                    nn.v = i
+                    nn.update_heuristic_cost()
+                    NextNodes.append(nn)
         return NextNodes
     def update_heuristic_cost(self):
         #updates the cost of the heuristic for the Node, used in the explore_node method to update the heuristic cost before returning the new nodes
@@ -74,6 +85,7 @@ class Node(object):
             orgtoville = np.amin(np.delete(self.solution.g.costs[0,:], cityvector))
             
         self.heuristic_cost = self.Kru.getMSTCost(self.solution) + villeproche + orgtoville
+        #self.heuristic_cost = 0     
         #print('ville la plus proche', villeproche)
         #print('closest to origin', orgtoville)
         #self.solution.print()
@@ -81,52 +93,35 @@ class Node(object):
         
         
 def main():
-    g = Graph("N10.data")
+    g = Graph("N17.data")
     sol = Solution(g)
     Nstart = Node(0, sol)
-    Nodes = []
-    Nodes.append(Nstart)
+    Nodes = Q.PriorityQueue()
+    Nodes.put(Nstart)
     solutionfound = 0
     t1 = time()
     while(solutionfound == 0):
-        Nnext = Nodes[len(Nodes)-1] # get the node be explored (which is the last one)
-        NewNodes = Nnext.explore_node()
-        newcost = []
-    
-        for i in range(0, len(NewNodes)):
-            newcost.append((NewNodes[i].solution.cost + NewNodes[i].heuristic_cost))
-
-        # Look for smallest cost not visited node
-        index = np.argwhere(newcost == np.amax(newcost))
-        a = NewNodes[int(index[0])]        
-        for j in range(0, len(NewNodes)):
-            if ((j in Nnext.solution.not_visited) and ( j!= 0)):
-                if (isN2betterThanN1(a, NewNodes[j])):
-                    a = NewNodes[j]
-                    index = j
-
-            if ((len(Nnext.solution.not_visited) == 1) and ( j == 0 )):
-                a = NewNodes[0]
-                index = 0
-
-        N = NewNodes[int(index)] # why not just use a 
-        Nodes.append(copy.deepcopy(N))
+        Nnext = Nodes.get(); # get the node with least A* cost
         
+        if (len(Nnext.solution.not_visited) == 0):
+            solutionfound = 1
+            print('solution found!')
+            print(Nnext.solution.print())
+            t2 = time()
+            td = t2-t1
+            print('time difference', td)        
+        else:
+            NewNodes = Nnext.explore_node()
+        
+            for i in range(0, len(NewNodes)):
+                #print("adding node at", NewNodes[i].v,"and cost", NewNodes[i].solution.cost + NewNodes[i].heuristic_cost)
+                Nodes.put(NewNodes[i])
+
         # Nodes should be using a high priority queue not just an array ...        
         
         #print(Nodes[len(Nodes)-1].solution.not_visited)
-        if (len(Nodes[len(Nodes)-1].solution.not_visited) == 0):
-            solutionfound = 1
-            print('solution found!')
-            print(len(Nodes), ' number of nodes explored')
-            print(Nodes[len(Nodes)-1].solution.print())
-            t2 = time()
-            td = t2-t1
-            print('time difference', td)
-    print(Nodes[0].solution.g.costs)
-
-
-
+       
+    #print(Nodes[0].solution.g.costs)
 
 
 def isN2betterThanN1(N1, N2):
