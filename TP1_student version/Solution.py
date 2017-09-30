@@ -7,35 +7,29 @@ from numpy import inf
 import copy
 
 class Solution(object):
-    def __init__(self, s):
-        if isinstance(s, Graph):
-            self.g = s
+    def __init__(self, val):
+        if isinstance(val, Graph):
+            self.g = val
             self.cost = 0
-            self.visited = []
-            self.not_visited = np.arange(0,s.N)
-            self.edgecosts = copy.deepcopy(s.costs)
-            self.edgecosts[self.edgecosts == 0] = inf
-            self.edges = []
+            self.visited = np.empty(shape=0, dtype = int)
+            self.not_visited = np.arange(0,val.N)
             self.explored_nodes = 0
             self.created_nodes = 0
-        elif isinstance(s, Solution):
-            self.g = s.g
-            self.cost = s.cost
-            self.visited = s.visited
-            self.not_visited = s.not_visited
-            self.edgecosts = s.edgecosts
-            self.edges = s.edges
-            self.explored_nodes = s.explored_nodes
-            self.created_nodes = s.created_nodes
+        elif isinstance(val, Solution):
+            self.g = val.g
+            self.cost = val.cost
+            self.visited = val.visited
+            self.not_visited = val.not_visited
+            self.explored_nodes = val.explored_nodes
+            self.created_nodes = val.created_nodes
         else:
             raise ValueError('you should give a graph or a solution')
 
     def add_edge(self, v, u):
         #do we need to check if v  is in the end of visited 
         self.cost = self.cost + self.g.get_edge(v,u).cost
-        self.visited.append(u)
+        self.visited = np.append(self.visited, u)
         self.not_visited = np.delete(self.not_visited, np.argwhere(self.not_visited == u))
-        self.edges.append(Edge(v,u, self.g.get_edge(v,u).cost))
 
     def print(self):
         print("These are the visited cities in order", self.visited)
@@ -44,21 +38,3 @@ class Solution(object):
         print("number of explored nodes ",self.explored_nodes)
         print("number of created nodes ",self.created_nodes)
 
-'''
-#Sol.add_edge(0,7)
-print(Sol.cost)
-print(Sol.visited)
-print(Sol.not_visited)
-
-print(Sol.edgecosts)
-#print(Sol.cost)
-
-#print(Sol.visited)
-#print(Sol.not_visited)
-#print(Sol.g.costs)
-
-#EXAMPLE MAP
-print(Sol.sortedcosts)
-print(Sol.sortedsources)
-print(Sol.sorteddestination)
-'''

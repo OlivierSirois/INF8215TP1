@@ -31,11 +31,3 @@ class Graph(object):
             return Edge(i, j, self.costs[i, j])
         else:
             return Edge(j, i, self.costs[i, j])
-
-#TEST DES CHAMPS
-#First = Graph('N12.data')
-#print(First.get_edge(1,2).cost)
-#print(First.N)
-
-#print(First.edges)
-#print(First.costs)
