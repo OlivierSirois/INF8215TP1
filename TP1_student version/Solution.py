@@ -16,6 +16,8 @@ class Solution(object):
             self.edgecosts = copy.deepcopy(s.costs)
             self.edgecosts[self.edgecosts == 0] = inf
             self.edges = []
+            self.explored_nodes = 0
+            self.created_nodes = 0
         elif isinstance(s, Solution):
             self.g = s.g
             self.cost = s.cost
@@ -23,6 +25,8 @@ class Solution(object):
             self.not_visited = s.not_visited
             self.edgecosts = s.edgecosts
             self.edges = s.edges
+            self.explored_nodes = s.explored_nodes
+            self.created_nodes = s.created_nodes
         else:
             raise ValueError('you should give a graph or a solution')
 
@@ -37,6 +41,8 @@ class Solution(object):
         print("These are the visited cities in order", self.visited)
         print("These are the ones left to visit in order", self.not_visited)
         print("Here is the cost for the trip",self.cost)
+        print("number of explored nodes ",self.explored_nodes)
+        print("number of created nodes ",self.created_nodes)
 
 '''
 #Sol.add_edge(0,7)

@@ -57,6 +57,7 @@ class Node(object):
             nn.v = 0
             nn.update_heuristic_cost()
             NextNodes.append(nn)
+            
         else:
             for i in self.solution.not_visited:
                 if i != 0:
@@ -93,18 +94,23 @@ class Node(object):
         
         
 def main():
-    g = Graph("N17.data")
+    g = Graph("N15.data")
     sol = Solution(g)
     Nstart = Node(0, sol)
     Nodes = Q.PriorityQueue()
     Nodes.put(Nstart)
     solutionfound = 0
     t1 = time()
+    explored = 0
+    created = 0
     while(solutionfound == 0):
-        Nnext = Nodes.get(); # get the node with least A* cost
-        
+        Nnext = Nodes.get(); # get the node with least A* cost        
+        explored = explored+1 
+       
         if (len(Nnext.solution.not_visited) == 0):
             solutionfound = 1
+            Nnext.solution.created_nodes = created 
+            Nnext.solution.explored_nodes = explored
             print('solution found!')
             print(Nnext.solution.print())
             t2 = time()
@@ -112,7 +118,8 @@ def main():
             print('time difference', td)        
         else:
             NewNodes = Nnext.explore_node()
-        
+            created = created + len(NewNodes)
+            sol.created_nodes =sol.created_nodes+ len(NewNodes)
             for i in range(0, len(NewNodes)):
                 #print("adding node at", NewNodes[i].v,"and cost", NewNodes[i].solution.cost + NewNodes[i].heuristic_cost)
                 Nodes.put(NewNodes[i])
