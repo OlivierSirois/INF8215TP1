@@ -51,7 +51,7 @@ class Kruskal(object):
 
         #calculating the total MST according to Kruskal's Algorithm
         for i in range(0, len(e)):
-            if((e[i].source == 0) | (e[i].destination == 0)):         
+            if((e[i].source == 0) | (e[i].destination == 0)):  #do not include edges that are conected to 0       
                 continue # Nothing            
             elif((e[i].destination in sol.not_visited) & (e[i].source in sol.not_visited)):           
                 if (not(self.uf.makes_cycle(e[i]))):

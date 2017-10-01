@@ -23,15 +23,15 @@ class Node(object):
     def explore_node(self):
         #Returns all possible nodes connected to this one in a form of a list
         NextNodes = []
-        if(len(self.solution.not_visited) == 1):
+        if(len(self.solution.not_visited) == 1): #if the only not visited city is 0, then we can add it
             nn = Node(self.v, self.solution)
             nn.solution.add_edge(nn.v,0)
             nn.v = 0
             nn.update_heuristic_cost()
             NextNodes.append(nn)
         else:
-            for i in self.solution.not_visited:
-                if i != 0:
+            for i in self.solution.not_visited: #explore the non-visited cities and create nodes
+                if i != 0:          #not explore the city 0
                     nn = Node(self.v, self.solution)
                     nn.solution.add_edge(nn.v,i)
                     nn.v = i
@@ -41,28 +41,28 @@ class Node(object):
         
     def update_heuristic_cost(self):
         #updates the cost of the heuristic for the Node, used in the explore_node method to update the heuristic cost before returning the new nodes                 
-
-        if(len(self.solution.not_visited) == 0):  
+        #
+        if(len(self.solution.not_visited) == 0):  #if solution is found , MST = 0
            villeproche = 0
            orgtoville = 0
            mstCost = 0
-        elif(len(self.solution.not_visited) == 1):  
+        elif(len(self.solution.not_visited) == 1): #if the only city left if 0
             villeproche = 0
             orgtoville = self.solution.g.costs[0, self.v]
             mstCost = 0
-        else:         
+        else:         #lower bound 
            costOfNonVistedWithoutZero = self.solution.g.costs[:,np.delete(self.solution.not_visited, 0)]
            orgtoville = np.amin(costOfNonVistedWithoutZero[0, :])
            villeproche = np.amin(costOfNonVistedWithoutZero[self.v, :])
            mstCost = self.Kru.getMSTCost(self.solution) 
-      
+        # different addition just to run program with diferent heuristic to have the result 
         self.heuristic_cost = 0
-        self.heuristic_cost = self.heuristic_cost + mstCost              
-        self.heuristic_cost = self.heuristic_cost + villeproche
-        self.heuristic_cost = self.heuristic_cost + orgtoville        
+        #self.heuristic_cost = self.heuristic_cost + mstCost  #get only the cost heuristic            
+        #self.heuristic_cost = self.heuristic_cost + villeproche
+        #self.heuristic_cost = self.heuristic_cost + orgtoville        
         
 def main():
-    g = Graph("N15.data")
+    g = Graph("N12.data")
     sol = Solution(g)
     Nstart = Node(0, sol)
     Nodes = Q.PriorityQueue()
@@ -83,7 +83,7 @@ def main():
             print(Nnext.solution.print())
             t2 = time()
             td = t2-t1
-            print('time difference', td)        
+            print('time difference (s)', td)        
         else:
             NewNodes = Nnext.explore_node()
             created = created + len(NewNodes)
