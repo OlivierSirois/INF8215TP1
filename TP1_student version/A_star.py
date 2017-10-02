@@ -57,12 +57,12 @@ class Node(object):
            mstCost = self.Kru.getMSTCost(self.solution) 
         # different addition just to run program with diferent heuristic to have the result 
         self.heuristic_cost = 0
-        #self.heuristic_cost = self.heuristic_cost + mstCost  #get only the cost heuristic            
-        #self.heuristic_cost = self.heuristic_cost + villeproche
-        #self.heuristic_cost = self.heuristic_cost + orgtoville        
+        self.heuristic_cost = self.heuristic_cost + mstCost  #get only the cost heuristic            
+        self.heuristic_cost = self.heuristic_cost + villeproche
+        self.heuristic_cost = self.heuristic_cost + orgtoville        
         
 def main():
-    g = Graph("N12.data")
+    g = Graph("N15.data")
     sol = Solution(g)
     Nstart = Node(0, sol)
     Nodes = Q.PriorityQueue()

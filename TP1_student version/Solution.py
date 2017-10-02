@@ -12,6 +12,7 @@ class Solution(object):
             self.g = val
             self.cost = 0
             self.visited = np.empty(shape=0, dtype = int)
+            self.visited = np.append(self.visited, 0) #need to appear twice in the solution
             self.not_visited = np.arange(0,val.N)
             self.explored_nodes = 0
             self.created_nodes = 0
@@ -33,7 +34,6 @@ class Solution(object):
 
     def print(self):
         print("These are the visited cities in order", self.visited)
-        print("These are the ones left to visit in order", self.not_visited)
         print("Here is the cost for the trip",self.cost)
         print("number of explored nodes ",self.explored_nodes)
         print("number of created nodes ",self.created_nodes)
