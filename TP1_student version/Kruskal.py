@@ -48,7 +48,7 @@ class Kruskal(object):
 
         #adding edges currently in our sol to our unionfind class
         e = self.g.get_sorted_edges()
-
+        cities = np.empty(shape=0, dtype = int)
         #calculating the total MST according to Kruskal's Algorithm
         for i in range(0, len(e)):
             if((e[i].source == 0) | (e[i].destination == 0)):  #do not include edges that are conected to 0       
@@ -57,6 +57,14 @@ class Kruskal(object):
                 if (not(self.uf.makes_cycle(e[i]))):
                     self.uf.add(e[i])
                     MSTCost = MSTCost + e[i].cost
+                    cities = np.append(cities, e[i].source)
+                    cities = np.append(cities, e[i].destination)
         
+        unique_elements, counts_elements = np.unique(cities, return_counts=True)
+        for i in range (1,len(counts_elements)):
+            if ( counts_elements[i] > 2): 
+                MSTCost= MSTCost+ counts_elements[i] - 2
+                
+             
         return(MSTCost)
         

@@ -95,11 +95,14 @@ def main():
 
 
 def isN2betterThanN1(N1, N2):
+    
     if ((N1.solution.cost + N1.heuristic_cost) > (N2.solution.cost + N2.heuristic_cost)):
         return True
+    elif ((N1.solution.cost + N1.heuristic_cost) == (N2.solution.cost + N2.heuristic_cost)) & (len(N1.solution.visited) < len(N2.solution.visited) ):
+        return True
+    
     else:
         return False
-
 
 if __name__ == '__main__':
     main()
